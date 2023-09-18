@@ -419,11 +419,6 @@ proc renameHook(v: var Activity, fieldName: var string) {.used.} =
     if fieldName == "type":
         fieldName = "kind"
 
-proc newActivity*(data: JsonNode): Activity =
-    if data.kind == JObject and data.fields.hasKey("application_id") and data.fields["application_id"].kind == JInt:
-        data.fields["application_id"] = newJString($data.fields["application_id"].num)
-    result = ($data).fromJson(Activity)
-
 proc renameHook(v: var AuditLogEntry, fieldName: var string) {.used.} =
     if fieldName == "options":
         fieldName = "opts"
