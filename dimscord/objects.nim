@@ -11,6 +11,7 @@ when (NimMajor, NimMinor, NimPatch) >= (1, 6, 0):
     {.warning[HoleEnumConv]: off.}
     {.warning[CaseTransition]: off.}
 
+import re
 import options
 import sequtils, strutils, jsony
 import std/with
@@ -241,7 +242,12 @@ proc parseHook(s: string, i: var int, v: var set[ActivityFlags]) =
     v = cast[set[ActivityFlags]](number)
 
 proc newPresence*(data: JsonNode): Presence =
-    result = ($data).fromJson(Presence)
+    var s = $data
+    let regex = re("\"application_id\":[0-9]+")
+    let (first, last) = findBounds(s, regex)
+    if first >= 0:
+        s = s[0..<first] & "\"application_id\":\"" & s[(first+17)..last] & "\"" & s[(last+1)..<s.len]
+    result = s.fromJson(Presence)
 
 proc parseHook*(s: string, i: var int, v: var set[PermissionFlags]) =
     var str: string
